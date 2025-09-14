@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>속담 나라 - 초등학생 속담 학습 앱</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Lucide Icons 대체 CSS */
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // 아이콘 컴포넌트들 (Lucide 대체)
+        const ChevronRight = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+        );
+
+        const Star = ({ className }) => (
+            <svg className={className} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"></polygon>
+            </svg>
+        );
+
+        const BookOpen = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+        );
+
+        const Users = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        );
+
+        const Home = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+            </svg>
+        );
+
+        const CheckCircle = ({ className }) => (
+            <svg className={className} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+            </svg>
+        );
+
+        const XCircle = ({ className }) => (
+            <svg className={className} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+        );
+
+        const Lightbulb = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M9 21h6"></path>
+                <path d="M12 17h.01"></path>
+                <path d="M12 3a6 6 0 0 1 6 6c0 3-2 5.5-2 8H8c0-2.5-2-5-2-8a6 6 0 0 1 6-6z"></path>
+            </svg>
+        );
+
+        const BarChart3 = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M3 3v18h18"></path>
+                <path d="M7 16V9"></path>
+                <path d="M12 16V6"></path>
+                <path d="M17 16v-8"></path>
+            </svg>
+        );
+
+        const Award = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"></polyline>
+            </svg>
+        );
+
+        const Download = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7,10 12,15 17,10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        );
+
+        // 속담 데이터 50개 완성
+        const PROVERBS_DATA = [
+            // 정직 관련 (5개)
+            { id: 1, proverb: "가는 말이 고와야 오는 말이 곱다", meaning: "다른 사람에게 좋은 말을 해야 좋은 말을 들을 수 있다", story: "민수가 친구에게 고마워라고 말하니, 친구도 천만에 또 도와줄게라고 따뜻하게 답해주었어요.", category: "정직", difficulty: "보통" },
+            { id: 2, proverb: "낮말은 새가 듣고 밤말은 쥐가 듣는다", meaning: "아무도 없는 것 같아도 말조심을 해야 한다", story: "지민이가 친구 욕을 했는데, 그 친구가 문 밖에서 다 들어버려서 크게 다퉜어요.", category: "정직", difficulty: "쉬움" },
+            { id: 3, proverb: "도둑이 제 발 저리다", meaning: "나쁜 일을 한 사람이 먼저 불안해한다", story: "숙제를 베낀 철수가 선생님이 오시자 얼굴이 빨갛게 되면서 당황했어요.", category: "정직", difficulty: "보통" },
+            { id: 4, proverb: "아니 땐 굴뚝에 연기 날까", meaning: "아무 이유 없이 소문이 나지는 않는다", story: "수아가 화내지도 않았는데 화났다는 소문이 나자, 뭔가 이유가 있을 거라고 생각했어요.", category: "정직", difficulty: "어려움" },
+            { id: 5, proverb: "말이 씨가 된다", meaning: "함부로 한 말이 현실이 될 수 있으니 조심해야 한다", story: "영희가 농담으로 비가 올 거라고 했는데 정말 비가 와서 소풍이 취소되었어요.", category: "정직", difficulty: "보통" },
+
+            // 노력/성실 관련 (15개)
+            { id: 6, proverb: "고생 끝에 낙이 온다", meaning: "힘들게 노력하면 결국 좋은 결과가 따른다", story: "매일 피아노 연습을 한 수아가 드디어 발표회에서 멋진 연주로 박수를 많이 받았어요.", category: "노력", difficulty: "쉬움" },
+            { id: 7, proverb: "티끌 모아 태산", meaning: "작은 것이라도 모이면 큰 것이 된다", story: "동우가 매일 10원씩 모았더니 1년 후에는 큰 돈이 되어 원하던 장난감을 살 수 있었어요.", category: "성실", difficulty: "쉬움" },
+            { id: 8, proverb: "천 리 길도 한 걸음부터", meaning: "아무리 큰 일도 작은 것부터 시작해야 한다", story: "태권도를 시작한 민준이가 처음에는 기본 자세부터 차근차근 배워나갔어요.", category: "노력", difficulty: "보통" },
+            { id: 9, proverb: "시작이 반이다", meaning: "어떤 일이든 시작하는 것이 가장 중요하다", story: "숙제하기 싫어하던 지우가 책상에 앉기만 했는데 금세 끝내버렸어요.", category: "성실", difficulty: "쉬움" },
+            { id: 10, proverb: "돌다리도 두들겨 보고 건너라", meaning: "아무리 확실한 일이라도 조심해서 해야 한다", story: "영희는 수학 문제를 다 풀고도 한 번 더 검산을 해서 실수를 찾아냈어요.", category: "성실", difficulty: "보통" },
+            { id: 11, proverb: "낫 놓고 기역자도 모른다", meaning: "아주 쉬운 것도 모를 정도로 무식하다", story: "컴퓨터 게임만 하던 철수가 구구단 2단도 외우지 못해 친구들이 깜짝 놀랐어요.", category: "성실", difficulty: "보통" },
+            { id: 12, proverb: "열 번 찍어 안 넘어가는 나무 없다", meaning: "꾸준히 노력하면 안 되는 일이 없다", story: "줄넘기를 못하던 소희가 매일 연습해서 드디어 100개를 넘게 뛸 수 있게 되었어요.", category: "인내", difficulty: "보통" },
+            { id: 13, proverb: "바늘 도둑이 소 도둑 된다", meaning: "작은 나쁜 행동이 큰 잘못으로 이어질 수 있다", story: "처음에는 친구 지우개만 가져가던 현우가 나중에는 돈까지 가져가게 되었어요.", category: "성실", difficulty: "어려움" },
+            { id: 14, proverb: "서당개 삼 년이면 풍월을 읊는다", meaning: "무엇이든 오래 보고 들으면 자연히 배우게 된다", story: "한자를 몰랐던 정민이가 할아버지와 함께 지내다 보니 어느새 한자를 읽을 수 있게 되었어요.", category: "학습", difficulty: "어려움" },
+            { id: 15, proverb: "소 잃고 외양간 고친다", meaning: "일이 잘못된 후에 뒤늦게 대책을 세운다", story: "휴대폰을 잃어버린 후에야 민호는 이름표를 붙이기 시작했어요.", category: "성실", difficulty: "보통" },
+            { id: 16, proverb: "가는 날이 장날", meaning: "어떤 일을 하려고 하는데 뜻하지 않은 일을 당한다", story: "소풍 가는 날 하필이면 비가 와서 아이들이 실망했어요.", category: "상황", difficulty: "보통" },
+            { id: 17, proverb: "가랑비에 옷 젖는 줄 모른다", meaning: "작은 일이라도 계속되면 큰 것이 된다", story: "조금씩 늦잠을 자던 하은이가 결국 지각하는 습관이 생겨버렸어요.", category: "성실", difficulty: "어려움" },
+            { id: 18, proverb: "개천에서 용 난다", meaning: "가난한 집에서 훌륭한 사람이 나온다", story: "어려운 환경에서 자란 준호가 열심히 공부해서 반에서 1등을 했어요.", category: "노력", difficulty: "보통" },
+            { id: 19, proverb: "목구멍이 포도청", meaning: "배가 고프면 체면을 차리지 못한다", story: "점심을 못 먹은 태현이가 평소 안 먹던 반찬도 다 먹어치웠어요.", category: "현실", difficulty: "어려움" },
+            { id: 20, proverb: "뒤로 넘어져도 코가 깨진다", meaning: "운이 없으면 뭘 해도 잘 안 된다", story: "시험 당일 감기에 걸린 지수는 연필심까지 부러져서 정말 운이 없었어요.", category: "운명", difficulty: "보통" },
+
+            // 배려/인간관계 (10개)
+            { id: 21, proverb: "웃는 얼굴에 침 뱉을 사람 없다", meaning: "늘 웃는 사람에게는 나쁜 짓을 할 마음이 생기지 않는다", story: "항상 밝게 웃는 서연이에게는 모든 친구들이 친절하게 대해줬어요.", category: "배려", difficulty: "쉬움" },
+            { id: 22, proverb: "백지장도 맞들면 낫다", meaning: "아무리 쉬운 일이라도 혼자 하는 것보다 둘이 함께 하는 것이 낫다", story: "청소를 혼자 하려던 민수가 친구와 함께 하니 훨씬 빨리 끝났어요.", category: "협력", difficulty: "보통" },
+            { id: 23, proverb: "고래 싸움에 새우 등 터진다", meaning: "강한 사람들이 싸우면 약한 사람이 피해를 본다", story: "반장과 부반장이 싸우는 바람에 평범한 학생들이 곤란해졌어요.", category: "배려", difficulty: "보통" },
+            { id: 24, proverb: "콩 심은 데 콩 나고 팥 심은 데 팥 난다", meaning: "원인에 따라 결과가 정해진다", story: "친구에게 친절하게 대한 유진이는 친구들로부터 친절을 받았어요.", category: "배려", difficulty: "보통" },
+            { id: 25, proverb: "남의 떡이 더 커 보인다", meaning: "다른 사람의 것이 더 좋아 보이는 법이다", story: "자신의 도시락보다 친구 도시락이 더 맛있어 보인다고 생각하는 아이들이 많았어요.", category: "만족", difficulty: "쉬움" },
+            { id: 26, proverb: "콩 한 쪽도 나누어 먹는다", meaning: "아무리 작은 것이라도 함께 나누어야 한다", story: "과자 하나뿐이었지만 지민이는 친구들과 조금씩 나누어 먹었어요.", category: "나눔", difficulty: "쉬움" },
+            { id: 27, proverb: "고운 말이 사람을 산다", meaning: "좋은 말을 하면 사람들이 좋아한다", story: "고마워, 미안해를 자주 말하는 예은이는 모든 친구들의 사랑을 받았어요.", category: "배려", difficulty: "쉬움" },
+            { id: 28, proverb: "물에 빠진 사람은 지푸라기라도 잡는다", meaning: "어려울 때는 작은 도움이라도 소중하다", story: "숙제를 못해서 걱정하던 준이에게는 친구의 작은 힌트도 큰 도움이 되었어요.", category: "도움", difficulty: "보통" },
+            { id: 29, proverb: "가까운 남이 먼 친척보다 낫다", meaning: "가까이 있는 사람이 더 도움이 된다", story: "아플 때 옆집 아주머니가 멀리 사는 삼촌보다 더 빨리 도와주셨어요.", category: "인간관계", difficulty: "보통" },
+            { id: 30, proverb: "가지 많은 나무에 바람 잘 날 없다", meaning: "복잡한 일이 많으면 걱정거리도 많아진다", story: "학원을 너무 많이 다니는 수빈이는 항상 바쁘고 스트레스를 받았어요.", category: "지혜", difficulty: "어려움" },
+
+            // 겸손/성찰 (10개)
+            { id: 31, proverb: "개구리 올챙이 적 생각 못한다", meaning: "지금의 좋은 처지를 누리며 예전의 어려웠던 때를 잊어버린다", story: "반장이 된 지민이가 청소를 안 하는 친구들을 혼내며, 자신도 예전엔 그랬다는 걸 깜빡했어요.", category: "겸손", difficulty: "어려움" },
+            { id: 32, proverb: "원숭이도 나무에서 떨어진다", meaning: "아무리 잘하는 사람도 때로는 실수할 수 있다", story: "공부를 제일 잘하는 지수도 오늘은 쉬운 문제를 틀려서 어 이상하네라고 중얼거렸어요.", category: "겸손", difficulty: "쉬움" },
+            { id: 33, proverb: "우물 안 개구리", meaning: "자신의 좁은 경험만으로 세상을 판단하면 안 된다", story: "시골에서만 살던 민준이가 서울에 와서 보니 세상이 정말 넓다는 걸 깨달았어요.", category: "겸손", difficulty: "보통" },
+            { id: 34, proverb: "등잔 밑이 어둡다", meaning: "가까이 있는 것을 오히려 모르는 경우가 많다", story: "안경을 찾아 헤매던 할머니의 안경이 할머니 머리 위에 있었어요.", category: "지혜", difficulty: "보통" },
+            { id: 35, proverb: "벼는 익을수록 고개를 숙인다", meaning: "실력이 늘수록 더욱 겸손해져야 한다", story: "실력이 늘수록 더욱 예의바르게 행동하는 태권도 고수 형아를 보며 감탄했어요.", category: "겸손", difficulty: "어려움" },
+            { id: 36, proverb: "수박 겉 핥기", meaning: "내용이나 참뜻을 모르면서 겉만 건드린다", story: "책을 대충 읽기만 하고 내용은 전혀 모르는 채로 독후감을 쓰려는 현수였어요.", category: "성실", difficulty: "보통" },
+            { id: 37, proverb: "작은 고추가 더 맵다", meaning: "겉으로 보기에 약해 보여도 함부로 보면 안 된다", story: "키가 작은 새 친구가 알고 보니 태권도 유단자여서 모두 놀랐어요.", category: "겸손", difficulty: "보통" },
+            { id: 38, proverb: "자기 꾀에 자기가 넘어간다", meaning: "자신이 꾸민 계교에 자신이 당하게 된다", story: "숙제를 안 하려고 아픈 척했던 민수가 정말 아프게 되어버렸어요.", category: "신중", difficulty: "어려움" },
+            { id: 39, proverb: "큰 나무 아래 서지 말라", meaning: "권세 있는 사람 곁에 있으면 화를 당할 수 있다", story: "반장과 싸운 친구 옆에 있던 수연이도 덩달아 혼이 났어요.", category: "지혜", difficulty: "어려움" },
+            { id: 40, proverb: "구슬도 꿰어야 보배", meaning: "아무리 좋은 것이라도 제대로 완성해야 쓸모가 있다", story: "계획만 세우고 실행하지 않으면 아무 소용이 없다는 걸 깨달은 지우였어요.", category: "실행", difficulty: "보통" },
+
+            // 절제/자기관리 (5개)
+            { id: 41, proverb: "급한 밥 먹다가 체한다", meaning: "서두르다가 도리어 일을 그르친다", story: "시험 시간이 부족하다고 급하게 문제를 풀던 은지가 오히려 실수를 많이 했어요.", category: "절제", difficulty: "보통" },
+            { id: 42, proverb: "참고 견디면 복이 온다", meaning: "어려움을 참고 견디면 결국 좋은 일이 생긴다", story: "친구와 싸우고 싶었지만 참았던 서준이는 나중에 더 좋은 친구가 되었어요.", category: "인내", difficulty: "보통" },
+            { id: 43, proverb: "시간은 금이다", meaning: "시간은 돈만큼 소중하니 헛되이 보내면 안 된다", story: "게임만 하다가 숙제할 시간이 없어진 태민이가 시간의 소중함을 깨달았어요.", category: "시간관리", difficulty: "쉬움" },
+            { id: 44, proverb: "꿩 먹고 알 먹는다", meaning: "한 가지 일로 두 가지 이익을 본다", story: "도서관에서 숙제도 하고 책도 읽어서 일석이조였어요.", category: "지혜", difficulty: "보통" },
+            { id: 45, proverb: "세 살 버릇 여든까지 간다", meaning: "어릴 때 형성된 습관은 평생 간다", story: "어릴 때부터 일찍 자는 습관이 있던 윤서는 지금도 일찍 잠자리에 들어요.", category: "습관", difficulty: "보통" },
+
+            // 지혜/판단력 (5개)
+            { id: 46, proverb: "닭 쫓던 개 지붕 쳐다본다", meaning: "하던 일이 갑자기 중단되어 어리둥절해한다", story: "축구를 하다가 갑자기 비가 와서 멈춰야 했던 아이들이 멍하니 하늘을 올려다봤어요.", category: "상황", difficulty: "보통" },
+            { id: 47, proverb: "호랑이에게 물려가도 정신만 차리면 산다", meaning: "아무리 위험한 상황에서도 침착하면 길이 있다", story: "길을 잃었을 때 당황하지 않고 침착하게 행동한 덕분에 무사히 집에 돌아올 수 있었어요.", category: "지혜", difficulty: "어려움" },
+            { id: 48, proverb: "윗물이 맑아야 아랫물이 맑다", meaning: "리더가 바르게 행동해야 다른 사람들도 따라한다", story: "반장이 먼저 교실 청소를 열심히 하니 다른 친구들도 따라서 열심히 했어요.", category: "리더십", difficulty: "어려움" },
+            { id: 49, proverb: "하늘이 무너져도 솟아날 구멍이 있다", meaning: "아무리 절망적인 상황이라도 반드시 해결책이 있다", story: "시험을 망쳤다고 생각했던 정우가 다른 방법으로 좋은 성적을 얻을 수 있었어요.", category: "희망", difficulty: "어려움" },
+            { id: 50, proverb: "빈 수레가 요란하다", meaning: "실속이 없는 사람이 더 떠들썩하다", story: "실력은 별로인데 자랑만 많이 하는 친구를 보며 속담의 뜻을 깨달았어요.", category: "겸손", difficulty: "보통" }
+        ];
+
+        // 퀴즈 데이터
+        const QUIZ_DATA = [
+            {
+                proverbId: 1,
+                questions: [
+                    {
+                        level: "쉬움",
+                        question: "다음 상황에 어울리는 속담은?",
+                        situation: "친구에게 친절하게 말했더니 친구도 친절하게 대답해 주었다.",
+                        options: ["가는 말이 고와야 오는 말이 곱다", "개구리 올챙이 적 생각 못한다", "고생 끝에 낙이 온다"],
+                        answer: 0,
+                        hint: "말을 주고받는 것에 관한 속담이에요."
+                    }
+                ]
+            },
+            {
+                proverbId: 2,
+                questions: [
+                    {
+                        level: "보통",
+                        question: "이 속담의 의미는 무엇일까요?",
+                        situation: "낮말은 새가 듣고 밤말은 쥐가 듣는다",
+                        options: ["열심히 노력해야 성공한다", "아무도 없어도 말조심을 해야 한다", "실수는 누구나 할 수 있다"],
+                        answer: 1,
+                        hint: "누군가 듣고 있을 수 있다는 뜻이에요."
+                    }
+                ]
+            }
+        ];
+
+        const ProverbLearningApp = () => {
+            const [currentMode, setCurrentMode] = useState('home');
+            const [currentProverb, setCurrentProverb] = useState(0);
+            const [score, setScore] = useState(0);
+            const [attempts, setAttempts] = useState(0);
+            const [showHint, setShowHint] = useState(false);
+            const [gameComplete, setGameComplete] = useState(false);
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [showResult, setShowResult] = useState(false);
+            const [currentQuestion, setCurrentQuestion] = useState(null);
+
+            const startGame = () => {
+                setCurrentMode('game');
+                setCurrentProverb(0);
+                setScore(0);
+                setAttempts(0);
+                setShowHint(false);
+                setGameComplete(false);
+                setCurrentQuestion(QUIZ_DATA[0]?.questions[0]);
+            };
+
+            const startStory = () => {
+                setCurrentMode('story');
+                setCurrentProverb(0);
+            };
+
+            const handleAnswerSelect = (answerIndex) => {
+                setSelectedAnswer(answerIndex);
+                setShowResult(true);
+                
+                if (answerIndex === currentQuestion.answer) {
+                    setScore(score + 1);
+                    setTimeout(() => {
+                        nextQuestion();
+                    }, 2000);
+                } else {
+                    setAttempts(attempts + 1);
+                    if (attempts >= 2) {
+                        setTimeout(() => {
+                            nextQuestion();
+                        }, 3000);
+                    } else {
+                        setTimeout(() => {
+                            setShowHint(true);
+                            setShowResult(false);
+                            setSelectedAnswer(null);
+                        }, 2000);
+                    }
+                }
+            };
+
+            const nextQuestion = () => {
+                if (currentProverb < Math.min(PROVERBS_DATA.length - 1, 6)) {
+                    const nextIndex = currentProverb + 1;
+                    setCurrentProverb(nextIndex);
+                    const nextQuiz = QUIZ_DATA.find(quiz => quiz.proverbId === PROVERBS_DATA[nextIndex].id);
+                    setCurrentQuestion(nextQuiz?.questions[0] || QUIZ_DATA[0].questions[0]);
+                    setSelectedAnswer(null);
+                    setShowResult(false);
+                    setAttempts(0);
+                    setShowHint(false);
+                } else {
+                    setGameComplete(true);
+                }
+            };
+
+            const Character = ({ emotion = 'happy', size = 'large' }) => {
+                const emotionIcon = emotion === 'happy' ? '😊' : emotion === 'thinking' ? '🤔' : '🎉';
+                const bgColor = emotion === 'happy' ? 'from-yellow-300 to-orange-300' : 
+                              emotion === 'thinking' ? 'from-blue-300 to-purple-300' : 
+                              'from-green-300 to-teal-300';
+                
+                return (
+                    <div className={`${size === 'large' ? 'w-32 h-32' : 'w-16 h-16'} mx-auto mb-4`}>
+                        <div className={`w-full h-full rounded-full bg-gradient-to-br ${bgColor} flex items-center justify-center text-4xl shadow-lg`}>
+                            {emotionIcon}
+                        </div>
+                    </div>
+                );
+            };
+
+            const HomeScreen = () => (
+                <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-blue-100 p-4">
+                    <div className="max-w-md mx-auto">
+                        <div className="text-center mb-8 pt-8">
+                            <Character emotion="happy" />
+                            <h1 className="text-3xl font-bold text-purple-800 mb-2">속담 나라</h1>
+                            <p className="text-purple-600">재미있게 속담을 배워보아요!</p>
+                        </div>
+                        <div className="space-y-4">
+                            <button 
+                                onClick={startGame}
+                                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between"
+                            >
+                                <div className="text-left">
+                                    <div className="text-xl font-bold">퀴즈 게임</div>
+                                    <div className="text-sm opacity-90">속담 의미 맞추기</div>
+                                </div>
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                            <button 
+                                onClick={startStory}
+                                className="w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between"
+                            >
+                                <div className="text-left">
+                                    <div className="text-xl font-bold">이야기 모드</div>
+                                    <div className="text-sm opacity-90">속담이 들어간 재미있는 이야기</div>
+                                </div>
+                                <BookOpen className="w-6 h-6" />
+                            </button>
+                            <button 
+                                onClick={() => setCurrentMode('teacher')}
+                                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between"
+                            >
+                                <div className="text-left">
+                                    <div className="text-xl font-bold">선생님 모드</div>
+                                    <div className="text-sm opacity-90">학습 현황 확인</div>
+                                </div>
+                                <Users className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="mt-8 p-4 bg-white/50 rounded-2xl">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-purple-700 font-medium">학습 진도</span>
+                                <span className="text-purple-600 text-sm">5 / 50</span>
+                            </div>
+                            <div className="w-full bg-purple-200 rounded-full h-3">
+                                <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full" style={{width: '10%'}}></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const GameScreen = () => {
+                if (!currentQuestion) return null;
+
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 p-4">
+                        <div className="max-w-md mx-auto">
+                            <div className="flex items-center justify-between mb-6">
+                                <button onClick={() => setCurrentMode('home')} className="p-2 bg-white/50 rounded-full">
+                                    <Home className="w-5 h-5 text-purple-600" />
+                                </button>
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-1">
+                                        <Star className="w-5 h-5 text-yellow-500" />
+                                        <span className="text-purple-700 font-bold">{score}</span>
+                                    </div>
+                                    <div className="text-sm text-purple-600">
+                                        {currentProverb + 1} / {Math.min(PROVERBS_DATA.length, 7)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white/80 rounded-2xl p-6 shadow-lg mb-6">
+                                <Character 
+                                    emotion={showResult ? (selectedAnswer === currentQuestion.answer ? 'celebrate' : 'thinking') : 'happy'} 
+                                />
+                                
+                                <div className="text-center mb-6">
+                                    <h2 className="text-lg font-bold text-purple-800 mb-2">{currentQuestion.question}</h2>
+                                    <p className="text-purple-600 bg-purple-50 p-3 rounded-lg">{currentQuestion.situation}</p>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {currentQuestion.options.map((option, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => !showResult && handleAnswerSelect(index)}
+                                            disabled={showResult}
+                                            className={`w-full p-4 rounded-xl text-left transition-all duration-300 ${
+                                                showResult 
+                                                    ? index === currentQuestion.answer 
+                                                        ? 'bg-green-500 text-white' 
+                                                        : index === selectedAnswer 
+                                                            ? 'bg-red-500 text-white' 
+                                                            : 'bg-gray-200 text-gray-600'
+                                                    : 'bg-white border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50'
+                                            }`}
+                                        >
+                                            <div className="flex items-center">
+                                                {showResult && index === currentQuestion.answer && <CheckCircle className="w-5 h-5 mr-2" />}
+                                                {showResult && index === selectedAnswer && index !== currentQuestion.answer && <XCircle className="w-5 h-5 mr-2" />}
+                                                <span className="font-medium">{option}</span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {showHint && (
+                                    <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
+                                        <div className="flex items-start">
+                                            <Lightbulb className="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
+                                            <div>
+                                                <p className="text-yellow-800 font-medium">힌트</p>
+                                                <p className="text-yellow-700 text-sm">{currentQuestion.hint}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {showResult && attempts >= 2 && selectedAnswer !== currentQuestion.answer && (
+                                    <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-lg">
+                                        <div className="flex items-start">
+                                            <BookOpen className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+                                            <div>
+                                                <p className="text-blue-800 font-medium">괜찮아요! 다시 배워보아요</p>
+                                                <p className="text-blue-700 text-sm">{PROVERBS_DATA[currentProverb].meaning}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const StoryScreen = () => (
+                <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-50 to-purple-100 p-4">
+                    <div className="max-w-md mx-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <button onClick={() => setCurrentMode('home')} className="p-2 bg-white/50 rounded-full">
+                                <Home className="w-5 h-5 text-purple-600" />
+                            </button>
+                            <h2 className="text-xl font-bold text-purple-800">이야기 속 속담</h2>
+                            <div className="text-sm text-purple-600">
+                                {currentProverb + 1} / {PROVERBS_DATA.length}
+                            </div>
+                        </div>
+
+                        <div className="bg-white/80 rounded-2xl p-6 shadow-lg mb-6">
+                            <Character emotion="happy" />
+                            
+                            <div className="text-center mb-6">
+                                <h3 className="text-xl font-bold text-purple-800 mb-4">
+                                    "{PROVERBS_DATA[currentProverb].proverb}"
+                                </h3>
+                                
+                                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg mb-4">
+                                    <p className="text-gray-700 leading-relaxed">
+                                        {PROVERBS_DATA[currentProverb].story}
+                                    </p>
+                                </div>
+                                
+                                <div className="bg-purple-50 p-4 rounded-lg">
+                                    <p className="text-purple-700 font-medium mb-1">이런 뜻이에요</p>
+                                    <p className="text-purple-600 text-sm">
+                                        {PROVERBS_DATA[currentProverb].meaning}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex space-x-3">
+                                <button 
+                                    onClick={() => setCurrentProverb(Math.max(0, currentProverb - 1))}
+                                    disabled={currentProverb === 0}
+                                    className="flex-1 bg-purple-200 text-purple-700 p-3 rounded-xl disabled:opacity-50"
+                                >
+                                    이전
+                                </button>
+                                <button 
+                                    onClick={() => setCurrentProverb(Math.min(PROVERBS_DATA.length - 1, currentProverb + 1))}
+                                    disabled={currentProverb === PROVERBS_DATA.length - 1}
+                                    className="flex-1 bg-purple-500 text-white p-3 rounded-xl disabled:opacity-50"
+                                >
+                                    다음
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const TeacherScreen = () => (
+                <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <button onClick={() => setCurrentMode('home')} className="p-2 bg-white rounded-full shadow-md">
+                                <Home className="w-5 h-5 text-gray-600" />
+                            </button>
+                            <h2 className="text-2xl font-bold text-gray-800">학습 관리 시스템</h2>
+                            <button className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg">
+                                <Download className="w-4 h-4" />
+                                <span>리포트 다운로드</span>
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div className="bg-white p-6 rounded-lg shadow-md">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">전체 학습 현황</h3>
+                                    <BarChart3 className="w-5 h-5 text-blue-500" />
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">완료한 속담</span>
+                                        <span className="font-bold text-green-600">15 / 50</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-green-500 h-2 rounded-full" style={{width: '30%'}}></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg shadow-md">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-800">오늘의 학습 현황</h3>
+                                    <Award className="w-5 h-5 text-yellow-500" />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">학습한 학생</span>
+                                        <span className="font-bold text-blue-600">8명</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">평균 점수</span>
+                                        <span className="font-bold text-purple-600">85점</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">학생별 학습 현황</h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-3">학생 이름</th>
+                                            <th className="px-6 py-3">학습 진도</th>
+                                            <th className="px-6 py-3">평균 점수</th>
+                                            <th className="px-6 py-3">미흡한 속담</th>
+                                            <th className="px-6 py-3">액션</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {['김민수', '이영희', '박철수', '최지민'].map((name, index) => (
+                                            <tr key={name} className="bg-white border-b hover:bg-gray-50">
+                                                <td className="px-6 py-4 font-medium text-gray-900">{name}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center">
+                                                        <span className="mr-2">{15 + index * 5}/50</span>
+                                                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                                                            <div className="bg-blue-500 h-2 rounded-full" style={{width: `${30 + index * 10}%`}}></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">{85 + index * 3}점</td>
+                                                <td className="px-6 py-4 text-red-600">{5 - index}개</td>
+                                                <td className="px-6 py-4">
+                                                    <button className="text-blue-600 hover:text-blue-800">
+                                                        상세보기
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            if (gameComplete) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-orange-50 to-pink-100 p-4 flex items-center justify-center">
+                        <div className="max-w-md mx-auto text-center">
+                            <Character emotion="celebrate" />
+                            <h2 className="text-3xl font-bold text-orange-600 mb-4">축하해요! 🎉</h2>
+                            <p className="text-orange-700 mb-6">모든 문제를 완료했어요!</p>
+                            <div className="bg-white/80 p-6 rounded-2xl shadow-lg mb-6">
+                                <div className="text-2xl font-bold text-purple-600 mb-2">최종 점수: {score}점</div>
+                                <div className="text-purple-500">속담 왕 칭호를 획득했어요!</div>
+                            </div>
+                            <button 
+                                onClick={() => setCurrentMode('home')}
+                                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-xl font-bold"
+                            >
+                                홈으로 돌아가기
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            switch(currentMode) {
+                case 'game':
+                    return <GameScreen />;
+                case 'story':
+                    return <StoryScreen />;
+                case 'teacher':
+                    return <TeacherScreen />;
+                default:
+                    return <HomeScreen />;
+            }
+        };
+
+        ReactDOM.render(<ProverbLearningApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
